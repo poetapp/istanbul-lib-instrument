@@ -29,7 +29,7 @@ instead.
 
 **Parameters**
 
--   `opts` **[Object][8]** optional.
+-   `opts` **[Object][8]** optional. (optional, default `defaultOpts()`)
     -   `opts.coverageVariable` **[string][9]** name of global coverage variable. (optional, default `__coverage__`)
     -   `opts.preserveComments` **[boolean][10]** preserve comments in output (optional, default `false`)
     -   `opts.compact` **[boolean][10]** generate compact code. (optional, default `true`)
