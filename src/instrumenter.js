@@ -8,21 +8,20 @@ import traverse from '@babel/traverse';
 import generate from '@babel/generator';
 import programVisitor from './visitor';
 
-function defaultOpts() {
-    return {
-        coverageVariable: "__coverage__",
-        preserveComments: false,
-        compact: true,
-        esModules: false,
-        autoWrap: false,
-        produceSourceMap: false,
-        ignoreClassMethods: [],
-        sourceMapUrlCallback: null,
-        debug: false,
-        staticType: 'flow',
-        plugins: [],
-    };
-}
+const defaultOps = {
+    coverageVariable: "__coverage__",
+    preserveComments: false,
+    compact: true,
+    esModules: false,
+    autoWrap: false,
+    produceSourceMap: false,
+    ignoreClassMethods: [],
+    sourceMapUrlCallback: null,
+    debug: false,
+    staticType: 'flow',
+    plugins: [],
+};
+
 /**
  * Instrumenter is the public API for the instrument library.
  * It is typically used for ES5 code. For ES6 code that you
@@ -43,28 +42,12 @@ function defaultOpts() {
  * @param {array} [opts.plugins=[]] - set plugins
  */
 class Instrumenter {
-    constructor(opts=defaultOpts()) {
-        this.opts = this.normalizeOpts(opts);
+    constructor(opts) {
+        this.opts = { ...defaultOps, ...opts };
         this.fileCoverage = null;
         this.sourceMap = null;
     }
-    /**
-     * normalize options passed in and assign defaults.
-     * @param opts
-     * @private
-     */
-    normalizeOpts(opts) {
-        const normalize = (name, defaultValue) => {
-            if (!opts.hasOwnProperty(name)) {
-                opts[name] = defaultValue;
-            }
-        };
-        const defOpts = defaultOpts();
-        Object.keys(defOpts).forEach(function (k) {
-            normalize(k, defOpts[k]);
-        });
-        return opts;
-    }
+
     /**
      * instrument the supplied code and track coverage against the supplied
      * filename. It throws if invalid code is passed to it. ES5 and ES6 syntax

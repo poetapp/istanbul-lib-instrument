@@ -27,27 +27,29 @@ function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function defaultOpts() {
-  return {
-    coverageVariable: "__coverage__",
-    preserveComments: false,
-    compact: true,
-    esModules: false,
-    autoWrap: false,
-    produceSourceMap: false,
-    ignoreClassMethods: [],
-    sourceMapUrlCallback: null,
-    debug: false,
-    staticType: 'flow',
-    plugins: []
-  };
-}
+var defaultOps = {
+  coverageVariable: "__coverage__",
+  preserveComments: false,
+  compact: true,
+  esModules: false,
+  autoWrap: false,
+  produceSourceMap: false,
+  ignoreClassMethods: [],
+  sourceMapUrlCallback: null,
+  debug: false,
+  staticType: 'flow',
+  plugins: []
+};
 /**
  * Instrumenter is the public API for the instrument library.
  * It is typically used for ES5 code. For ES6 code that you
@@ -68,56 +70,32 @@ function defaultOpts() {
  * @param {array} [opts.plugins=[]] - set plugins
  */
 
-
 var Instrumenter =
 /*#__PURE__*/
 function () {
-  function Instrumenter() {
-    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultOpts();
-
+  function Instrumenter(opts) {
     _classCallCheck(this, Instrumenter);
 
-    this.opts = this.normalizeOpts(opts);
+    this.opts = _objectSpread({}, defaultOps, opts);
     this.fileCoverage = null;
     this.sourceMap = null;
   }
   /**
-   * normalize options passed in and assign defaults.
-   * @param opts
-   * @private
+   * instrument the supplied code and track coverage against the supplied
+   * filename. It throws if invalid code is passed to it. ES5 and ES6 syntax
+   * is supported. To instrument ES6 modules, make sure that you set the
+   * `esModules` property to `true` when creating the instrumenter.
+   *
+   * @param {string} code - the code to instrument
+   * @param {string} filename - the filename against which to track coverage.
+   * @param {object} [inputSourceMap] - the source map that maps the not instrumented code back to it's original form.
+   * Is assigned to the coverage object and therefore, is available in the json output and can be used to remap the
+   * coverage to the untranspiled source.
+   * @returns {string} the instrumented code.
    */
 
 
   _createClass(Instrumenter, [{
-    key: "normalizeOpts",
-    value: function normalizeOpts(opts) {
-      var normalize = function normalize(name, defaultValue) {
-        if (!opts.hasOwnProperty(name)) {
-          opts[name] = defaultValue;
-        }
-      };
-
-      var defOpts = defaultOpts();
-      Object.keys(defOpts).forEach(function (k) {
-        normalize(k, defOpts[k]);
-      });
-      return opts;
-    }
-    /**
-     * instrument the supplied code and track coverage against the supplied
-     * filename. It throws if invalid code is passed to it. ES5 and ES6 syntax
-     * is supported. To instrument ES6 modules, make sure that you set the
-     * `esModules` property to `true` when creating the instrumenter.
-     *
-     * @param {string} code - the code to instrument
-     * @param {string} filename - the filename against which to track coverage.
-     * @param {object} [inputSourceMap] - the source map that maps the not instrumented code back to it's original form.
-     * Is assigned to the coverage object and therefore, is available in the json output and can be used to remap the
-     * coverage to the untranspiled source.
-     * @returns {string} the instrumented code.
-     */
-
-  }, {
     key: "instrumentSync",
     value: function instrumentSync(code, filename, inputSourceMap) {
       if (typeof code !== 'string') {
